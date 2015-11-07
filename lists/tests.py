@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.template.loader import render_to_string
 from django.core.urlresolvers import resolve
 from django.http import HttpRequest, HttpResponse
 
@@ -15,7 +16,5 @@ class HomePageTest(TestCase):
     def test_home_page_has_some_html(self):
         request = HttpRequest()
         response = home_page(request)
-        assert isinstance(response, HttpResponse)
-        assert response.content.startswith(b'<html>')
-        assert b'<title>Todo lists</title>' in response.content
-        assert response.content.endswith(b'</html>')
+        expected_html = render_to_string('home.html')
+        assert response.content.decode() == expected_html
