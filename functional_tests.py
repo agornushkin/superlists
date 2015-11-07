@@ -33,12 +33,22 @@ class NewVisitorTest(unittest.TestCase):
         # "1: Buy tickets to the Moon" as an item in a to-do list
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        assert any(row.text == user_input_1 for row in rows), "A new todo item did not appear in the table"
+        assert any(row.text == '1: %s' % user_input_1 for row in rows),\
+            "A new todo item did not appear in the tables. Its text was:\n%s" % table.text
         # There is still a text box inviting her to add another item. She
         # enters "Go to rover driving lesson" (Edith is very methodical)
+        input_box = self.browser.find_element_by_id('id_new_item')
         user_input_2 = "Go to rover driving lesson"
+        input_box.send_keys(user_input_2)
+        input_box.send_keys(Keys.ENTER)
 
         # The page updates again, and now shows both items on her list
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        assert any(row.text == '1: %s' % user_input_1 for row in rows),\
+            "A new todo item did not appear in the tables. Its text was:\n%s" % table.text
+        assert any(row.text == '2: %s' % user_input_2 for row in rows),\
+            "A new todo item did not appear in the tables. Its text was:\n%s" % table.text
         self.fail("Finish the test")
         # Edith wonders whether the site will remember her list. Then she sees
         # that the site has generated a unique URL for her -- there is some

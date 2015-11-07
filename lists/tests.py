@@ -17,4 +17,18 @@ class HomePageTest(TestCase):
         request = HttpRequest()
         response = home_page(request)
         expected_html = render_to_string('home.html')
-        assert response.content.decode() == expected_html
+        assert expected_html == response.content.decode()
+
+    def test_home_page_can_save_a_post_request(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = 'A new list item'
+
+        response = home_page(request)
+        assert 'A new list item' in response.content.decode()
+
+        expected_html = render_to_string(
+            'home.html',
+            {'new_item_text': 'A new list item'}
+        )
+        assert expected_html == response.content.decode()
