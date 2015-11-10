@@ -4,6 +4,7 @@ from django.core.urlresolvers import resolve
 from django.http import HttpRequest, HttpResponse
 
 from .views import home_page
+from .models import Item
 # Create your tests here.
 
 
@@ -32,3 +33,21 @@ class HomePageTest(TestCase):
             {'new_item_text': 'A new list item'}
         )
         assert expected_html == response.content.decode()
+
+class ItemUnitTest(TestCase):
+
+    def test_saving_and_retrieving_items(self):
+        first_item = Item()
+        first_item.text = 'First (ever) item'
+        first_item.save()
+
+        second_item = Item()
+        second_item.text = 'Second item'
+        second_item.save()
+
+        all_items = Item.objects.all()
+        assert  all_items.count() == 2
+
+        first_saved_item, second_saved_item = all_items
+        assert first_saved_item.text == 'First (ever) item'
+        assert second_saved_item.text == 'Second item'
