@@ -25,14 +25,36 @@ class HomePageTest(TestCase):
         request.method = 'POST'
         request.POST['item_text'] = 'A new list item'
 
-        response = home_page(request)
-        assert 'A new list item' in response.content.decode()
+        home_page(request)
 
-        expected_html = render_to_string(
-            'home.html',
-            {'new_item_text': 'A new list item'}
-        )
-        assert expected_html == response.content.decode()
+        assert Item.objects.count() == 1
+        new_item = Item.objects.first()
+        assert new_item.text == 'A new list item'
+
+    def test_home_page_redirects_after_posts(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = 'A new list item'
+
+        response = home_page(request)
+        assert response.status_code == 302
+        assert response['location'] == '/'
+
+    def test_home_page_does_not_save_empty_items(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        home_page(request)
+        assert Item.objects.count() == 0, 'Empty list item saved'
+
+    def test_home_page_displays_multiple_items(self):
+        item_1 = Item.objects.create(text='First item')
+        item_2 = Item.objects.create(text='Second item')
+
+        request = HttpRequest()
+        response = home_page(request)
+
+        self.assertIn(item_1.text, response.content.decode())
+        self.assertIn(item_2.text, response.content.decode())
 
 class ItemUnitTest(TestCase):
 
