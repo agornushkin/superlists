@@ -1,12 +1,13 @@
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from django.test import LiveServerTestCase
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
@@ -58,6 +59,3 @@ class NewVisitorTest(unittest.TestCase):
         # She visits that URL - her to-do list is still there.
 
         # Satisfied, she goes back to sleep
-
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
