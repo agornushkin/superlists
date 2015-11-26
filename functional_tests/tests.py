@@ -32,30 +32,49 @@ class NewVisitorTest(LiveServerTestCase):
 
         # She types "Buy tickets to the moon" into a text box (Edith's hobby
         # is travelling)
-        user_input_1 = "Buy tickets to the Moon"
-        input_box.send_keys(user_input_1)
+        edith_input_1 = "Buy tickets to the Moon"
+        input_box.send_keys(edith_input_1)
         input_box.send_keys(Keys.ENTER)
-
+        edith_list_url = self.browser.current_url
+        self.assertRegex(edith_list_url, 'lists/.+')
         # When she hits enter, the page updates, and now the page lists
         # "1: Buy tickets to the Moon" as an item in a to-do list
-        self.check_for_row_in_list_table('1: %s' % user_input_1)
+        self.check_for_row_in_list_table('1: %s' % edith_input_1)
 
         # There is still a text box inviting her to add another item. She
         # enters "Go to rover driving lesson" (Edith is very methodical)
         input_box = self.browser.find_element_by_id('id_new_item')
-        user_input_2 = "Go to rover driving lesson"
-        input_box.send_keys(user_input_2)
+        edith_input_2 = "Go to rover driving lesson"
+        input_box.send_keys(edith_input_2)
         input_box.send_keys(Keys.ENTER)
 
         # The page updates again, and now shows both items on her list
-        self.check_for_row_in_list_table('1: %s' % user_input_1)
-        self.check_for_row_in_list_table('2: %s' % user_input_2)
+        self.check_for_row_in_list_table('1: %s' % edith_input_1)
+        self.check_for_row_in_list_table('2: %s' % edith_input_2)
 
-        self.fail("Finish the test")
-        # Edith wonders whether the site will remember her list. Then she sees
-        # that the site has generated a unique URL for her -- there is some
-        # explanatory text to that effect.
+        # Now a new user, John, logs in
 
-        # She visits that URL - her to-do list is still there.
+        # use a new browser session
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+        self.browser.get(self.live_server_url)
 
-        # Satisfied, she goes back to sleep
+        # John cannot see Edith's list items
+        page_text = self.browser.find_element_by_tag_name('body')
+        self.assertNotIn(edith_input_1, page_text)
+        self.assertNotIn(edith_input_2, page_text)
+
+        # John adds some items of his own
+        input_box = self.browser.find_element_by_id('id_new_item')
+        input_box.send_keys("Buy milk")
+        input_box.send_keys(Keys.ENTER)
+
+        # John gets his own url
+        john_list_url = self.browser.current_url
+        self.assertNotEqual(edith_list_url, john_list_url)
+        self.assertRegex(john_list_url, 'lists/.+')
+
+        # John still cannot see Edith's items
+        page_text = self.browser.find_element_by_tag_name('body')
+        self.assertNotIn(edith_input_1, page_text)
+        self.assertNotIn(edith_input_2, page_text)
