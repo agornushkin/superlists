@@ -60,7 +60,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.browser.get(self.live_server_url)
 
         # John cannot see Edith's list items
-        page_text = self.browser.find_element_by_tag_name('body')
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(edith_input_1, page_text)
         self.assertNotIn(edith_input_2, page_text)
 

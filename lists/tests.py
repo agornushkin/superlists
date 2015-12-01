@@ -38,7 +38,7 @@ class HomePageTest(TestCase):
 
         response = home_page(request)
         assert response.status_code == 302
-        assert response['location'] == '/'
+        self.assertEqual(response['location'], '/lists/the-only-list')
 
     def test_home_page_does_not_save_empty_items(self):
         request = HttpRequest()
@@ -46,15 +46,6 @@ class HomePageTest(TestCase):
         home_page(request)
         assert Item.objects.count() == 0, 'Empty list item saved'
 
-    def test_home_page_displays_multiple_items(self):
-        item_1 = Item.objects.create(text='First item')
-        item_2 = Item.objects.create(text='Second item')
-
-        request = HttpRequest()
-        response = home_page(request)
-
-        self.assertIn(item_1.text, response.content.decode())
-        self.assertIn(item_2.text, response.content.decode())
 
 class ItemUnitTest(TestCase):
 
@@ -73,3 +64,19 @@ class ItemUnitTest(TestCase):
         first_saved_item, second_saved_item = all_items
         assert first_saved_item.text == 'First (ever) item'
         assert second_saved_item.text == 'Second item'
+
+
+class ListViewTest(TestCase):
+
+    def test_list_template_used(self):
+        response = self.client.get('/lists/the-only-list/', follow=True)
+        self.assertTemplateUsed(response, 'list.html')
+
+    def test_displays_all_items(self):
+        item_1 = Item.objects.create(text='First item')
+        item_2 = Item.objects.create(text='Second item')
+
+        response = self.client.get('/lists/the-only-list/', follow=True)
+
+        self.assertContains(response, item_1.text)
+        self.assertContains(response, item_2.text)

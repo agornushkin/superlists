@@ -19,5 +19,6 @@ from django.contrib import admin
 
 urlpatterns = [
     # url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', views.home_page, name='lists_home')
+    url(r'^$', views.home_page, name='lists_home'),
+    url(r'^lists/the-only-list/$', views.view_list, name='view_list'),
 ]
