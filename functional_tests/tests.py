@@ -78,3 +78,16 @@ class NewVisitorTest(LiveServerTestCase):
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(edith_input_1, page_text)
         self.assertNotIn(edith_input_2, page_text)
+
+
+    def test_layout_and_styling(self):
+        # Edith goes to the home page
+        self.browser.set_window_size(1024, 768)
+
+        # She notices the input box is nicely centered
+        input_box = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            input_box.location['x'] + input_box.size['width'] // 2,
+            512,
+            delta=5
+        )
