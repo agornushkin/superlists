@@ -75,6 +75,6 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertRegex(john_list_url, 'lists/.+')
 
         # John still cannot see Edith's items
-        page_text = self.browser.find_element_by_tag_name('body')
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn(edith_input_1, page_text)
         self.assertNotIn(edith_input_2, page_text)
