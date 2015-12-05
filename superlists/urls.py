@@ -1,4 +1,5 @@
-from lists import views
+from lists import views as list_views
+from lists import urls as list_urls
 """superlists URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -19,8 +20,6 @@ from django.contrib import admin
 
 urlpatterns = [
     # url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', views.home_page, name='lists_home'),
-    url(r'^lists/new$', 'lists.views.new_list', name='new_list'),
-    url(r'^lists/(.+)/add_item$', 'lists.views.add_item', name='add_item'),
-    url(r'^lists/(\d+)/$', 'lists.views.view_list', name='view_list'),
+    url(r'^$', list_views.home_page, name='lists_home'),
+    url(r'^lists/', include(list_urls)),
 ]
