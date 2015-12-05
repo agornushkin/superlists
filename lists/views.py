@@ -1,14 +1,15 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
-from .models import Item
+from .models import Item, List
 
 
 def home_page(request):
+    list_ = List.objects.create()
     if request.method == 'POST':
         new_item_text = request.POST.get('item_text', '')
         if new_item_text:
-            Item.objects.create(text=new_item_text)
+            Item.objects.create(text=new_item_text, list=list_)
         return redirect('/lists/the-only-list')
     return render(request, 'home.html')
 
