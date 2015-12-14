@@ -1,13 +1,28 @@
-import unittest
+import sys
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 
 class NewVisitorTest(StaticLiveServerTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        for arg in sys.argv:
+            if 'liveserver=' in arg:
+                cls.server_url = 'http://{}'.format(arg.split('=', 1)[-1])
+                return
+        cls.server_url = cls.live_server_url
+        super().setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.server_url == cls.live_server_url:
+            super().tearDownClass()
+
     def setUp(self):
         self.browser = webdriver.Firefox()
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
@@ -57,7 +72,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         # use a new browser session
         self.browser.quit()
         self.browser = webdriver.Firefox()
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
 
         # John cannot see Edith's list items
         page_text = self.browser.find_element_by_tag_name('body').text
