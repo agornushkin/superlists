@@ -25,7 +25,7 @@ SECRET_KEY = '!bc(^8k4yakk9)_5b7)5*3lyoj-#@_d4hb@1rjc864^p%o71u@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -102,3 +102,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+import dj_database_url
+
+DATABASES['default'] = dj_database_url.config(default='sqlite:///'+os.path.join(BASE_DIR, '../database/db.sqlite3'))
+
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

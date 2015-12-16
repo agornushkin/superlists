@@ -1,4 +1,10 @@
 Django==1.8.6
+dj-database-url==0.3.0
+dj-static==0.0.6
+django-toolbelt==0.0.1
+gunicorn==19.4.1
+psycopg2==2.6.1
 py==1.4.31
 pytest==2.8.3
 selenium==2.48.0
+static3==0.6.1
