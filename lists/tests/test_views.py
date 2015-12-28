@@ -3,9 +3,8 @@ from django.template.loader import render_to_string
 from django.core.urlresolvers import resolve
 from django.http import HttpRequest, HttpResponse
 
-from .views import home_page
-from .models import Item, List
-# Create your tests here.
+from ..views import home_page
+from ..models import Item, List
 
 
 class HomePageTest(TestCase):
@@ -45,35 +44,6 @@ class NewListTest(TestCase):
         request.method = 'POST'
         home_page(request)
         assert Item.objects.count() == 0, 'Empty list item saved'
-
-
-class ItemAndListModelsUnitTest(TestCase):
-
-    def test_saving_and_retrieving_items(self):
-        list_ = List()
-        list_.save()
-
-        first_item = Item()
-        first_item.text = 'First (ever) item'
-        first_item.list = list_
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = 'Second item'
-        second_item.list = list_
-        second_item.save()
-
-        saved_list = List.objects.first()
-        self.assertEqual(list_, saved_list)
-
-        all_items = Item.objects.all()
-        assert all_items.count() == 2
-
-        first_saved_item, second_saved_item = all_items
-        assert first_saved_item.text == 'First (ever) item'
-        self.assertEqual(first_saved_item.list, list_)
-        assert second_saved_item.text == 'Second item'
-        self.assertEqual(second_saved_item.list, list_)
 
 
 class ListViewTest(TestCase):
