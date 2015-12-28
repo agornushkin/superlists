@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.template.loader import render_to_string
 from django.core.urlresolvers import resolve
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest
+from django.utils.html import escape
 
 from ..views import home_page
 from ..models import Item, List
@@ -39,11 +40,17 @@ class NewListTest(TestCase):
         )
         self.assertRedirects(response, '/lists/1/')
 
-    def test_home_page_does_not_save_empty_items(self):
-        request = HttpRequest()
-        request.method = 'POST'
-        home_page(request)
-        assert Item.objects.count() == 0, 'Empty list item saved'
+    def test_home_page_returns_error_on_saving_empty_items(self):
+        response = self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+        expected_error = escape("You can't have an empty list item")
+        self.assertContains(response, expected_error)
+
+    def test_empty_list_items_are_not_saved(self):
+        self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(List.objects.count(), 0)
+        self.assertEqual(Item.objects.count(), 0)
 
 
 class ListViewTest(TestCase):

@@ -10,7 +10,7 @@ class ValidationTest(FunctionalTest):
         # Tries to add an empty item
         self.browser.find_element_by_id('id_new_item').send_keys('\n')
         # Gets an error
-        error = self.browser.find_element_by_css_selector('.error')
+        error = self.browser.find_element_by_css_selector('.has-error')
         self.assertEqual(error.text, "You can't have an empty list item")
         # Corrects
         self.browser.find_element_by_id('id_new_item').send_keys('Buy milk\n')
