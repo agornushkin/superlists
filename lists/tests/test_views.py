@@ -7,7 +7,7 @@ from django.utils.html import escape
 
 from ..views import home_page
 from ..models import Item, List
-from ..forms import ItemForm, EMPTY_ITEM_ERROR
+from ..forms import ItemForm, ExistingListItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR
 
 
 class HomePageTest(TestCase):
@@ -143,7 +143,7 @@ class ListViewTest(TestCase):
     def test_displays_item_form(self):
         list_ = List.objects.create()
         response = self.client.get('/lists/{}/'.format(list_.id))
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
 
     def test_for_invalid_input_saves_nothing_to_db(self):
         self.post_invalid_input()
@@ -155,23 +155,20 @@ class ListViewTest(TestCase):
 
     def test_for_invalid_input_passes_form_to_temlpate(self):
         response = self.post_invalid_input()
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
 
     def test_for_invalid_input_displays_error_message(self):
         response = self.post_invalid_input()
         expected_error = escape(EMPTY_ITEM_ERROR)
         self.assertContains(response, expected_error)
 
-    @skip
     def test_dupliacate_items_validaton_errors_end_up_on_list_page(self):
         list_ = List.objects.create()
-        item = Item.objects.create(list=list_, text='textey')
-
+        Item.objects.create(list=list_, text='textey')
         response = self.client.post(
             '/lists/{}/'.format(list_.id),
             data={'text': 'textey'}
         )
-        expected_error = "You've already got this in your list"
-        self.assertContains(response, expected_error)
+        self.assertContains(response, escape(DUPLICATE_ITEM_ERROR))
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.count(), 1)
