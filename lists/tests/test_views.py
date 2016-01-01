@@ -6,7 +6,7 @@ from django.utils.html import escape
 
 from ..views import home_page
 from ..models import Item, List
-from ..forms import ItemForm
+from ..forms import ItemForm, EMPTY_ITEM_ERROR
 
 
 class HomePageTest(TestCase):
@@ -40,12 +40,19 @@ class NewListTest(TestCase):
         )
         self.assertRedirects(response, '/lists/1/')
 
-    def test_home_page_returns_error_on_saving_empty_items(self):
+    def test_for_invalid_input_renders_home_template(self):
         response = self.client.post('/lists/new', data={'text': ''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
-        expected_error = escape("You can't have an empty list item")
+
+    def test_validation_errors_are_shown_on_home_page(self):
+        response = self.client.post('/lists/new', data={'text': ''})
+        expected_error = escape(EMPTY_ITEM_ERROR)
         self.assertContains(response, expected_error)
+
+    def test_for_invalid_input_passes_form_to_template(self):
+        response = self.client.post('/lists/new', data={'text': ''})
+        self.assertIsInstance(response.context['form'], ItemForm)
 
     def test_empty_list_items_are_not_saved(self):
         self.client.post('/lists/new', data={'text': ''})
@@ -57,11 +64,16 @@ class NewListTest(TestCase):
         response = self.client.post('/lists/{}/'.format(list_.id), data={'text': ''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'list.html')
-        expected_error = escape("You can't have an empty list item")
+        expected_error = escape(EMPTY_ITEM_ERROR)
         self.assertContains(response, expected_error)
 
 
 class ListViewTest(TestCase):
+
+    def post_invalid_input(self):
+        list_ = List.objects.create()
+        response = self.client.post('/lists/{}/'.format(list_.id), data={'text': ''})
+        return response
 
     def test_list_template_used(self):
         list_ = List.objects.create()
@@ -126,3 +138,26 @@ class ListViewTest(TestCase):
             follow=True,
         )
         self.assertRedirects(response, '/lists/{}/'.format(correct_list.id))
+
+    def test_displays_item_form(self):
+        list_ = List.objects.create()
+        response = self.client.get('/lists/{}/'.format(list_.id))
+        self.assertIsInstance(response.context['form'], ItemForm)
+
+    def test_for_invalid_input_saves_nothing_to_db(self):
+        self.post_invalid_input()
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_for_invalid_input_renders_list_template(self):
+        response = self.post_invalid_input()
+        self.assertTemplateUsed(response, 'list.html')
+
+    def test_for_invalid_input_passes_form_to_temlpate(self):
+        response = self.post_invalid_input()
+        self.assertIsInstance(response.context['form'], ItemForm)
+
+    def test_for_invalid_input_displays_error_message(self):
+        response = self.post_invalid_input()
+        expected_error = escape(EMPTY_ITEM_ERROR)
+        self.assertContains(response, expected_error)
+
