@@ -19,7 +19,7 @@ def view_list(request, list_id):
             item.delete()
             return render(request, 'list.html', context={'error': "You can't have an empty list item", 'list': list_})
         else:
-            return redirect('/lists/{}/'.format(list_.id))
+            return redirect(list_)
     return render(request, 'list.html', {'list': list_})
 
 
@@ -32,4 +32,5 @@ def new_list(request):
     except ValidationError as exc:
         list_.delete()
         return render(request, 'home.html', context={'error': "You can't have an empty list item"})
-    return redirect('/lists/{}'.format(list_.id))
+    # return redirect('/lists/{}'.format(list_.id))
+    return redirect(list_)
