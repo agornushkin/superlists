@@ -8,7 +8,7 @@ class LayOutTest(FunctionalTest):
         self.browser.set_window_size(1024, 768)
 
         # She notices the input box is nicely centered
-        input_box = self.browser.find_element_by_id('id_new_item')
+        input_box = self.find_input_box_for_new_item()
         self.assertAlmostEqual(
             input_box.location['x'] + input_box.size['width'] // 2,
             512,
