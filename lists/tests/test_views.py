@@ -52,6 +52,14 @@ class NewListTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
+    def test_list_page_returns_error_on_saving_empty_items(self):
+        list_ = List.objects.create()
+        response = self.client.post('/lists/{}/'.format(list_.id), data={'item_text': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'list.html')
+        expected_error = escape("You can't have an empty list item")
+        self.assertContains(response, expected_error)
+
 
 class ListViewTest(TestCase):
 
