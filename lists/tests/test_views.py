@@ -94,15 +94,12 @@ class ListViewTest(TestCase):
         response = self.client.get('/lists/{}/'.format(correct_list.id))
         self.assertEqual(response.context['list'], correct_list)
 
-
-class NewItemTest(TestCase):
-
     def test_can_save_a_new_item_to_existing_list(self):
         correct_list = List.objects.create()
         other_list = List.objects.create()
 
         self.client.post(
-            '/lists/{}/add_item'.format(correct_list.id),
+            '/lists/{}/'.format(correct_list.id),
             data={'item_text': 'A new item to existing list'},
             follow=True,
         )
@@ -116,7 +113,7 @@ class NewItemTest(TestCase):
         other_list = List.objects.create()
 
         response = self.client.post(
-            '/lists/{}/add_item'.format(correct_list.id),
+            '/lists/{}/'.format(correct_list.id),
             data={'item_text': 'A new item to existing list'},
             follow=True,
         )
