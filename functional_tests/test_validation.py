@@ -56,5 +56,19 @@ class ValidationTest(FunctionalTest):
         # notices that the error magically disappeared
         self.assertFalse(error.is_displayed())
 
+    def test_errors_disappear_on_click_on_input_box(self):
+        # Edith go to home page
+        self.browser.get(self.server_url)
+        # Adds an empty item which causes an error
+        self.find_input_box_for_new_item().send_keys('\n')
+        error = self.find_error_element()
+        self.assertTrue(error.is_displayed())
+
+        # clicks on the input box to start fixing an error
+        self.find_input_box_for_new_item().click()
+
+        # notices that the error magically disappeared
+        self.assertFalse(error.is_displayed())
+
 
 
